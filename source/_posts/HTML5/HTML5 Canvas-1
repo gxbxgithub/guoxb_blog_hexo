@@ -1,0 +1,145 @@
+﻿---
+title: HTML5 Canvas系列教程-1
+categories: HTML5
+tags: 
+  - Canvas
+---
+一条HTML5 canvas路径是通过绘制指令来连接一系列的点，由这一系列的点构成直线或曲线。路径可以用于在HTML5 canvas上绘制各种类型的图形：直线、圆形、多边形等等。路径的绘制是canvas的核心，必须很好的理解和掌握。
+<!-- more -->
+
+### 1.开始和关闭一条路径
+```
+var canvas = document.getElementById('canvas');
+var context = canvas.getContext('2d');
+context.beginPath(); //开始路径
+// ...绘制路径
+context.closePath(); //关闭路径
+```
+
+### 2.moveTo()函数
+当你在canvas中绘制一条路径的时候，你可以想象自己正在使用一支“虚拟笔”。这支虚拟笔总是位于某个位置，你可以使用2D上下文的moveTo(x, y)函数来移动这支虚拟笔
+```
+context.moveTo(x, y);
+```
+
+### 3.lineTo()函数
+lineTo函数用于从虚拟笔的当前位置绘制一条直线到lineTo()函数中指定的点
+```
+context.moveTo(x, y);
+context.lineTo(x2, y2);
+```
+
+### 4.stroke()函数 + fill()函数
+在你没有通知2D上下文绘制路径之前，实际是不会在画布上绘制任何东西的。你可以通过stroke()或fill()函数来通知2D上下文。
+（1）stroke()函数用于路径操作指定的图形的外轮廓。
+（2）fill()函数用于填充有路径操作指定的图形。
+stroke()用于描边儿；fill()用于填充；
+
+### 5.线条的线条（lineCap）
+（1）butt 样式的线头是扁平且和线正交的样式。
+（2）round 样式的线头是一个圆角的线头，圆的半径等于线条宽度的一半。
+（3）square 样式的线头会在线的末端绘制一个矩形。矩形的大小为：线条的宽度 X 线条的宽/2。
+
+### 6.线条的连接（线条相交样式）
+（1）miter 相交的头部是尖的；
+（2）bevel 相交的头部是平的；
+（3）round 相交的头部是圆的。
+
+### 7.绘制曲线
+2D上下文的arc()函数可以用于绘制一条曲线。
+```
+context.lineWidth = 3;
+ 
+var x = 50;
+var y = 50;
+var radius = 25;
+var startAngle = (Math.PI / 180) * 45;
+var endAngle   = (Math.PI / 180) * 180;
+var anticlockwise = false; //顺时针
+ 
+context.beginPath();
+context.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+context.stroke();
+context.closePath();     
+```
+
+（1）arcTo()函数
+2D上下文中有一个arcTo()函数，它用于从当前的点绘制一条曲线到参数指定的点，曲线的半径也由参数指定。它的语法为：arcTo(x1, y1, x2, y2, radius)。注意：参数中x1, y1, x2, y2指的是这个点的控制点。arcTo()函数可以使用lineTo()和arc函数来模仿。
+
+（2）quadraticCurveTo()函数
+```
+context.lineWidth = 3;
+ 
+var fromX = 50;
+var fromY = 50;
+var toX   = 100;
+var toY   = 50;
+var cpX   = 75; //参照点
+var cpY   = 100; //参照点
+ 
+context.beginPath();
+context.moveTo(fromX, fromY);
+context.quadraticCurveTo(cpX, cpY, toX, toY);
+context.stroke();
+context.closePath();         
+```
+
+（3）bezierCurveTo()函数
+bezierCurveTo()函数用于从一个点到另一个点绘制一条三次贝兹曲线。三次贝兹曲线有两个控制点，而二次贝兹曲线只有一个控制点。它的语法为：bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y)。
+```
+context.lineWidth = 3;
+ 
+var fromX = 50;
+var fromY = 50;
+var toX   = 300;
+var toY   = 50;
+var cp1X   = 100;
+var cp1Y   = 10;
+var cp2X   = 250;
+var cp2Y   = 100;
+ 
+context.beginPath();
+context.moveTo(fromX, fromY);
+context.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, toX, toY);
+context.stroke();
+context.closePath();     
+```
+
+### 8.渐变
+（1）线性渐变 createLinearGradient()
+createLinearGradient()函数有4个参数：x1，y1，x2和y2。这4个参数决定渐变的方向和距离。线性渐变会从第一个点(x1,y1)扩展到第二个点(x2,y2)。
+```
+var x1 =   0;
+var y1 =   0;
+var x2 = 100;
+var y2 = 100;
+
+var linearGradient1 = context.createLinearGradient(x1,y1,x2,y2);   
+linearGradient1.addColorStop(0  , 'rgb(255, 0, 0)');
+linearGradient1.addColorStop(0.5, 'rgb(  0, 0, 255);
+linearGradient1.addColorStop(1  , 'rgb(  0, 0, 0)');   
+
+context.fillStyle   = linearGradient1; // 渐变填充
+context.strokeStyle = linearGradient1; // 渐变描边
+```
+addColorStop()方法有两个参数。第一个参数是0-1之间的一个数值，这个数值指定该颜色进入渐变多长的距离，第二个参数是颜色值。
+上面的代码在渐变的中间添加了一个蓝色。整个渐变将平滑的从红色过渡到蓝色，在过渡到黑色。
+（2）径向渐变 createRadialGradient()
+```
+var x1 = 100;   // 第一个圆圆心的X坐标
+var y1 = 100;   // 第一个圆圆心的Y坐标
+var r1 = 30;    // 第一个圆的半径
+ 
+var x2 = 100;   // 第二个圆圆心的X坐标
+var y2 = 100;   // 第二个圆圆心的Y坐标
+var r2 = 100;   // 第二个圆的半径
+ 
+var radialGradient1 =
+    context.createRadialGradient(x1, y1, r1, x2, y2, r2);
+ 
+radialGradient1.addColorStop(0, 'rgb(0,   0, 255)');
+radialGradient1.addColorStop(1, 'rgb(0, 255,   0)');
+ 
+context.fillStyle = radialGradient1;
+context.fillRect(10,10, 200, 200);              
+```
